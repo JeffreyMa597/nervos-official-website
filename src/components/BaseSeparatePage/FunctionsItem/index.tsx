@@ -1,12 +1,13 @@
 import React, { FC } from 'react'
 import clsx from 'clsx'
+import { TOCItem } from '../../../components/TableOfContents'
 
 import styles from './index.module.scss'
 
 export type FunctionsItemType = {
-  title: string | React.ReactNode
+  title: string
+  titleRender?: (title: string) => React.ReactNode
   tags?: string[]
-  idx?: number
   content?: string | React.ReactNode
   isProgressBar?: boolean
   className?: string
@@ -14,14 +15,22 @@ export type FunctionsItemType = {
 
 const TagItem = ({ tag }: { tag: string }) => <div className={clsx(styles.tagItem)}>{tag}</div>
 
-export const FunctionsItem: FC<FunctionsItemType> = ({ title, tags, content, isProgressBar, idx, className }) => (
-  <div
+export const FunctionsItem: FC<FunctionsItemType> = ({
+  title,
+  titleRender,
+  tags,
+  content,
+  isProgressBar,
+  className,
+}) => (
+  <TOCItem
     data-is-progress-bar={isProgressBar}
-    id={typeof title === 'string' ? title : `functions-${idx!}`}
-    className={clsx(styles.functionsItem, 'observeTitle', className)}
+    id={encodeURIComponent(title.toLowerCase().replaceAll(' ', '_'))}
+    titleInTOC={title}
+    className={clsx(styles.functionsItem, className)}
   >
     <div className={clsx(styles.titleWrap)}>
-      <div className={clsx(styles.title)}>{title}</div>
+      <div className={clsx(styles.title)}>{titleRender ? titleRender(title) : title}</div>
       <div className={clsx(styles.tags)}>
         {tags?.map((tag, index) => (
           <TagItem tag={tag} key={index} />
@@ -29,5 +38,5 @@ export const FunctionsItem: FC<FunctionsItemType> = ({ title, tags, content, isP
       </div>
     </div>
     <div className={clsx(styles.content)}>{content}</div>
-  </div>
+  </TOCItem>
 )
